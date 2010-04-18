@@ -480,6 +480,11 @@ TranManager::TranManager(fileList files, int lines)
 }
 
 
+std::vector<TranManager::Operation> TranManager::getTrans(void)
+{
+	return Transaction;
+}
+
 TranManager::~TranManager(void)
 {
 }

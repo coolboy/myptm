@@ -6,6 +6,7 @@
 #include <boost/assign.hpp>
 
 #include "TranManager.h"
+#include "Scheduler.h"
 
 using namespace std;
 
@@ -101,6 +102,9 @@ int main(int argc, char** argv)
 	  lines = rand() % 10 + 1; //allow to read 1 - 10 lines once
 	  TranManager TransactionManager = TranManager(FileLinesList,lines);
 	}
+
+	//operations in transactions:  TRAN_ID, OP_TYPE, MODE, FILE_NAME, RECORD_ID, CLIENT_NAME, PHONE	
+	
 
 	return 0;
 }
