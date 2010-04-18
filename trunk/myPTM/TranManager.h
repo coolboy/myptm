@@ -35,11 +35,12 @@ private:
 
 private:
 	
-	std::list<Operation> Transaction;
+	std::vector<Operation> Transaction;
 
 public:
 	TranManager(fileList files);
 	TranManager(fileList files, int lines);
+
 	~TranManager(void);
 };
 
