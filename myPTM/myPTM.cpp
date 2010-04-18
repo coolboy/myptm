@@ -79,15 +79,15 @@ int main(int argc, char** argv)
 	mySeed = atoi(argv[1]);
 	RoundRobin = atoi(argv[2]);
 	lines = atoi(argv[3]);
-	argc -= 2;
+	argc -= 3;
 
 	i = 4;
 
-	while(argc--)
+	while(argc-- > 1)
 	{
 		vector<string> lines;
 		filePathes.push_back(argv[i]);  
-	//	lines = ReadLines(argv[i]);
+		lines = ReadLines1(argv[i]);
 		FileLinesList.push_back(lines);
 		i++;
 	}
