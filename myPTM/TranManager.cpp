@@ -17,20 +17,23 @@ TranManager::TranManager(fileList files)
 	//variables used to hold parsed strings
 	int fileIndex=0;
 	int fileNum = files.size();
-	vector<int> FileCurrMode, FileCurrTranId;
-//	int CurrRecordId, CurrPhone;
+	//vector<int> FileCurrMode, FileCurrTranId;
+	int FileCurrMode[10], FileCurrTranId[10], FileCurrReadLine[10], FileLineNum[10];
 	int TranIdGlobal = 0;
 	
-
-//	OpType CurrOpType;
 	string  CurrFileName, CurrName;
 	Operation CurrOp;
 
+	if(fileNum > 10)
+	{
+		cerr << "two many files! " << "\n";
+	}
 
 	mark_tag op(1),opbegin(2), opabord(3), opcommit(4),
 		mode(5), filename(6), id(7), name(8), phone(9),delim(10);
 
 	cregex begin = (opbegin = 'B')
+		       >> (delim= *_s)
 		       >> (mode = (boost::xpressive::set= '0','1'));
 
 	cregex commit = (opcommit = 'C');
@@ -41,37 +44,59 @@ TranManager::TranManager(fileList files)
 	
 	cregex fileop1 = (op = (boost::xpressive::set= 'R','W','D'))
 		       >> (delim= *_s)
-		       >> (filename= +(alpha | '.'))
-			   >> delim >> '('>> delim
-			   >> (id= +_d) >>delim >> ','
-			   >> (name= +alpha) >>delim >> ','
+		       >> (filename= +(_w | '.'))
+			   >> (delim= *_s) >> '('>> (delim= *_s)
+			   >> (id= +_d) >>(delim= *_s) >> ','
+			   >> (name= +_w) >>(delim= *_s) >> ','
 			   >> (phone= +(_d | '-'))
-			   >> delim >> ')';
+			   >> (delim= *_s) >> ')';
+    
+	cregex fileop2 = (op = (boost::xpressive::set= 'R','W','D'))
+		       >> (delim= +_s)
+		       >> (filename= +(_w | '.'))
+			   >> (delim= +_s) 
+			   >> (id= +_d); 
 
-	cregex fileop2 = op 
-		       >> delim
-		       >> filename
-			   >> delim 
-			   >> id;
+	cregex fileop3 = (op = 'D')
+		       >> (delim= +_s)
+		       >> (filename= +(_w | '.'));
+
+			  
 			   
-    /*
-	cregex date = (month = repeat<1>(_d))           // find the month ...
-               >> (delim= (set= '/','-'))            // followed by a delimiter ...
-               >> (day=   repeat<1,2>(_d)) >> delim  // and a day followed by the same delimiter ...
-               >> (year=  repeat<1,2>(_d >> _d));    // and the year.
-    */
+	//cregex fileop2 = op; 
+		 //      >> delim
+		//       >> filename
+		//	   >> delim 
+		//	   >> id;
+			   
     cmatch what;
+
+	//initialize
+	for(fileIndex=0; fileIndex<fileNum; fileIndex++)
+	{
+		
+	   FileCurrMode[fileIndex] = -1;
+	   FileCurrTranId[fileIndex] = 0;
+	   FileCurrReadLine[fileIndex] = 0;
+	   FileLineNum[fileIndex] = files[fileIndex].size();
+
+	   cout << "number of transactions in file" << fileIndex << ": " << FileLineNum[fileIndex] <<"\n";
+	}
+
+	int fileProcessed, linesProcessed;
+	linesProcessed = 0;
 
 	while(1) 
 	{
-		
+		fileProcessed = 0;
+
 		for(fileIndex=0; fileIndex<fileNum; fileIndex++)
 		{
 			CurrFile = files[fileIndex];
 			
-			if(CurrLinePos < files.size())
+			if(FileCurrReadLine[fileIndex] < FileLineNum[fileIndex])
 			{
-				CurrLine = CurrFile.at(CurrLinePos);
+				CurrLine = CurrFile.at(FileCurrReadLine[fileIndex]);
 			    // mark_tag day(1), month(2), year(3), delim(4);
 
                 // this regex finds a date
@@ -88,6 +113,8 @@ TranManager::TranManager(fileList files)
 					CurrOp.m1 = BEGIN;
 					CurrOp.m2 = FileCurrMode[fileIndex];
 					Transaction.push_back(CurrOp);			
+					FileCurrReadLine[fileIndex]++;
+					linesProcessed++;
 			    }
 				
 				else if(regex_search(CurrLine.c_str(), what, commit))
@@ -99,6 +126,8 @@ TranManager::TranManager(fileList files)
 					CurrOp.m2 = FileCurrMode[fileIndex];
 
 					Transaction.push_back(CurrOp);
+					FileCurrReadLine[fileIndex]++;
+					linesProcessed++;
 				}
 				
 				else if(regex_search(CurrLine.c_str(), what, abord))
@@ -110,6 +139,8 @@ TranManager::TranManager(fileList files)
 					CurrOp.m2 = FileCurrMode[fileIndex];
 
 					Transaction.push_back(CurrOp);
+					FileCurrReadLine[fileIndex]++;
+					linesProcessed++;
 				}
 				
 				else if(regex_search(CurrLine.c_str(), what, fileop1))
@@ -138,6 +169,9 @@ TranManager::TranManager(fileList files)
 					CurrOp.m6 = what[phone].str();
               
 					Transaction.push_back(CurrOp);
+
+					FileCurrReadLine[fileIndex]++;
+					linesProcessed++;
 				}
 				
 				else if(regex_search(CurrLine.c_str(), what, fileop2))
@@ -163,13 +197,56 @@ TranManager::TranManager(fileList files)
               
 					Transaction.push_back(CurrOp);
 
+					FileCurrReadLine[fileIndex]++;
+					linesProcessed++;
+
 				}
+
+				else if(regex_search(CurrLine.c_str(), what, fileop3))
+				{
+				    std::cout << what[0] << '\n';  // whole match
+
+					//operation:  TRAN_ID, OP_TYPE, MODE, FILE_NAME, RECORD_ID, NAME, PHONE
+
+					CurrOp.m0 = FileCurrTranId[fileIndex];
+				
+					if(what[op].compare("R") == 0)
+					   CurrOp.m1 = READ;
+					else if(what[op].compare("W") == 0)
+					   CurrOp.m1 = WRITE;
+					else if(what[op].compare("D") == 0)
+					   CurrOp.m1 = DEL;
+				
+                    CurrOp.m2 = FileCurrMode[fileIndex];
+
+					CurrOp.m3 = what[filename].str();
+              
+					Transaction.push_back(CurrOp);
+
+					FileCurrReadLine[fileIndex]++;
+					linesProcessed++;
+
+				}
+				else
+				    FileCurrReadLine[fileIndex]++;
 
 			}
 
 		}
-		CurrLinePos++;
+	//	CurrLinePos++;
+
+		for(fileIndex=0; fileIndex<fileNum; fileIndex++)
+	    {
+		   if(FileCurrReadLine[fileIndex] == FileLineNum[fileIndex] || FileCurrReadLine[fileIndex] == 0)
+		     fileProcessed++;
+	    }
+
+		if(fileProcessed == fileNum)
+			break;
 	}
+
+	cout <<"total number of input operations: " << linesProcessed << "\n";
+	cout <<"total number of transactions: " << TranIdGlobal << "\n";
 }
 
 TranManager::TranManager(fileList files, int lines)
@@ -184,12 +261,12 @@ TranManager::TranManager(fileList files, int lines)
 	int fileIndex=0;
 	int lineIndex;
 	int fileNum = files.size();
-	vector<int> FileCurrMode, FileCurrTranId;
-//	int CurrRecordId, CurrPhone;
+	//vector<int> FileCurrMode, FileCurrTranId;
+    int FileCurrMode[10], FileCurrTranId[10];
 	int TranIdGlobal = 0;
 
-	vector<int> FileLineNum, FileLineReadNum;
-	
+	//vector<int> FileLineNum, FileLineReadNum;
+	int FileLineNum[10], FileLineReadNum[10];
 	//initialize the file properties(line numbers, current red line number, etc.)
 	for(fileIndex=0; fileIndex<fileNum; fileIndex++)
 	{
@@ -208,6 +285,7 @@ TranManager::TranManager(fileList files, int lines)
 		mode(5), filename(6), id(7), name(8), phone(9),delim(10);
 
 	cregex begin = (opbegin = 'B')
+		       >> (delim= *_s)
 		       >> (mode = (boost::xpressive::set= '0','1'));
 
 	cregex commit = (opcommit = 'C');
@@ -218,18 +296,22 @@ TranManager::TranManager(fileList files, int lines)
 	
 	cregex fileop1 = (op = (boost::xpressive::set= 'R','W','D'))
 		       >> (delim= *_s)
-		       >> (filename= +(alpha | '.'))
-			   >> delim >> '('>> delim
-			   >> (id= +_d) >>delim >> ','
-			   >> (name= +alpha) >>delim >> ','
+		       >> (filename= +(_w | '.'))
+			   >> (delim= *_s) >> '('>> (delim= *_s)
+			   >> (id= +_d) >>(delim= *_s) >> ','
+			   >> (name= +_w) >>(delim= *_s) >> ','
 			   >> (phone= +(_d | '-'))
-			   >> delim >> ')';
+			   >> (delim= *_s) >> ')';
+    
+	cregex fileop2 = (op = (boost::xpressive::set= 'R','W','D'))
+		       >> (delim= +_s)
+		       >> (filename= +(_w | '.'))
+			   >> (delim= +_s) 
+			   >> (id= +_d); 
 
-	cregex fileop2 = op 
-		       >> delim
-		       >> filename
-			   >> delim 
-			   >> id;
+	cregex fileop3 = (op = 'D')
+		       >> (delim= +_s)
+		       >> (filename= +(_w | '.'));
 			   
     /*
 	cregex date = (month = repeat<1>(_d))           // find the month ...
@@ -255,7 +337,8 @@ TranManager::TranManager(fileList files, int lines)
         
 		while(1)
 		{
-		   fileIndex = rand() % (fileNum - 1);
+		   fileIndex = rand() % fileNum;
+		   cout << "reading file: " << fileIndex <<"\n";
 		   if(FileLineReadNum[fileIndex] < FileLineNum[fileIndex])
 			   break;
 		}
@@ -267,7 +350,7 @@ TranManager::TranManager(fileList files, int lines)
 		if(FileLineReadNum[fileIndex] >= FileLineNum[fileIndex])
 		  FileLineReadNum[fileIndex] = FileLineNum[fileIndex];
 
-		for(lineIndex=FileLineReadNum[fileIndex]; lineIndex < FileLineReadNum[fileIndex]; lineIndex++)
+		for(lineIndex=oldLine; lineIndex < FileLineReadNum[fileIndex]; lineIndex++)
 		{
 			CurrLine = CurrFile.at(lineIndex);
 		    // mark_tag day(1), month(2), year(3), delim(4);
@@ -362,6 +445,32 @@ TranManager::TranManager(fileList files, int lines)
 				Transaction.push_back(CurrOp);
 
 			}
+
+			else if(regex_search(CurrLine.c_str(), what, fileop3))
+				{
+				    std::cout << what[0] << '\n';  // whole match
+
+					//operation:  TRAN_ID, OP_TYPE, MODE, FILE_NAME, RECORD_ID, NAME, PHONE
+
+					CurrOp.m0 = FileCurrTranId[fileIndex];
+				
+					if(what[op].compare("R") == 0)
+					   CurrOp.m1 = READ;
+					else if(what[op].compare("W") == 0)
+					   CurrOp.m1 = WRITE;
+					else if(what[op].compare("D") == 0)
+					   CurrOp.m1 = DEL;
+				
+                    CurrOp.m2 = FileCurrMode[fileIndex];
+
+					CurrOp.m3 = what[filename].str();
+              
+					Transaction.push_back(CurrOp);
+
+				
+
+				}
+				
 
 			
 
