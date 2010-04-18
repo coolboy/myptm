@@ -10,7 +10,7 @@
 
 class TranManager
 {
-private:
+public:
   typedef enum 
   {
     READ = 0,
@@ -27,7 +27,7 @@ private:
   //typedef boost::fusion::vector2<OpType, int> Operation2;
   //typedef boost::fusion::vector3<OpType, std::string, int> Operation3;
   
-  //this is the operation:  TRAN_ID, OP_TYPE, MODE, FILE_NAME, RECORD_ID, NAME, PHONE	
+  //this is the operation:  TRAN_ID, OP_TYPE, MODE, FILE_NAME, RECORD_ID, CLIENT_NAME, PHONE	
   typedef boost::fusion::vector7<int, OpType, int, std::string, int, std::string, std::string> Operation;
 
   //typedef std::map<int,Operation> NumberedOp;
@@ -40,7 +40,7 @@ private:
 public:
 	TranManager(fileList files);
 	TranManager(fileList files, int lines);
-
+	std::vector<Operation> getTrans(void);
 	~TranManager(void);
 };
 
