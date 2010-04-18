@@ -68,7 +68,7 @@ int main(int argc, char** argv)
 	int lines;
 
 	std::vector<const char*> filePathes;  //the files starts at the third input parameters
-	typedef std::vector<string> StrVec;
+	typedef vector<string> StrVec;
 	std::vector<StrVec> FileLinesList;
 
 	if (argc < 5){
