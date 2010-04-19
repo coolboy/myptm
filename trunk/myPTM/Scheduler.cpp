@@ -7,7 +7,7 @@ Scheduler::Scheduler(void)
    
 }
 
-std::vector<TranManager::Operation> Scheduler::ScheduleTransactions(std::vector<TranManager::Operation> Transactions)
+Operations Scheduler::ScheduleTransactions(Operations Transactions)
 {
    return Transactions;
 }

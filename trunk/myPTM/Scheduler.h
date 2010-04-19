@@ -6,7 +6,7 @@ class Scheduler
 
 public:
 	Scheduler(void);
-	std::vector<TranManager::Operation> ScheduleTransactions(std::vector<TranManager::Operation> Transactions);
+	Operations ScheduleTransactions(Operations Transactions);
 	~Scheduler(void);
 };
 
