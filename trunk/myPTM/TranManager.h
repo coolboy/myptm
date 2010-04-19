@@ -38,6 +38,7 @@ private:
 	std::vector<Operation> Transaction;
 
 public:
+	TranManager();
 	TranManager(fileList files);
 	TranManager(fileList files, int lines);
 	std::vector<Operation> getTrans(void);
@@ -45,3 +46,4 @@ public:
 };
 
 typedef std::vector<TranManager::Operation> Operations;
+typedef TranManager::OpType Optype;

@@ -6,6 +6,11 @@ using namespace std;
 
 using namespace boost::xpressive;
 
+TranManager::TranManager()
+{
+
+}
+
 TranManager::TranManager(fileList files)
 {
 	vector<vector<string>>::iterator fileIter;

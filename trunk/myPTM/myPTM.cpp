@@ -7,6 +7,7 @@
 
 #include "TranManager.h"
 #include "Scheduler.h"
+#include "DataManager.h"
 
 using namespace std;
 
@@ -49,6 +50,10 @@ vector<string> ReadLines1(const char* fileName)
    vector<string> lines;
 
    ifstream ifs(fileName);
+
+   if (!ifs){
+		return lines;
+	}
 
    string line; /* space to read a line into */      
 		
@@ -95,16 +100,24 @@ int main(int argc, char** argv)
 
 	srand(mySeed);
 
+	//operation input and transaction management:
+	TranManager TransactionManager;
 	if(RoundRobin)
-	  TranManager TransactionManager = TranManager(FileLinesList);
+	   TransactionManager = TranManager(FileLinesList);
 	else
 	{
 	  lines = rand() % 10 + 1; //allow to read 1 - 10 lines once
-	  TranManager TransactionManager = TranManager(FileLinesList,lines);
+	  TransactionManager = TranManager(FileLinesList,lines);
 	}
 
 	//operations in transactions:  TRAN_ID, OP_TYPE, MODE, FILE_NAME, RECORD_ID, CLIENT_NAME, PHONE	
 	
+	//schedule the transactions here:
+
+
+	//output to database
+	DataManager myData;
+	myData.UpdateDatabase(TransactionManager.getTrans());
 
 	return 0;
 }
