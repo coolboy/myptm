@@ -1,12 +1,8 @@
 #pragma once
 
-#include <boost/variant.hpp>
-#include <boost/fusion/include/at_c.hpp>
-#include <boost/config/warning_disable.hpp>
-#include <boost/spirit/include/qi.hpp>
-#include <boost/bind.hpp>
-#include <boost/algorithm/string/join.hpp>
-#include <boost/foreach.hpp>
+#include <string>
+#include <vector>
+#include <boost/fusion/container/vector.hpp>
 
 class TranManager
 {
