@@ -3,7 +3,9 @@
 #include <boost/optional.hpp>
 
 // first: get it?
-// second: the deadlock ids
+// second: 
+// the current locker tid if single
+// the deadlock ids if multi
 typedef std::pair<bool, boost::optional<std::vector<int>>> LockCondition;
 
 class LockManager
@@ -13,7 +15,8 @@ public:
 	~LockManager(void);
 
 	//lock the item and return the trans ids in the cycle if detect a dead lock
-	LockCondition Lock (int tid, int itemid, const std::string&	fileName);
+	// type: 0-read 1-write -1-error
+	LockCondition Lock (int tid, int itemid, int type, const std::string&	fileName);
 
 	//lock the whole file  and return the trans ids in the cycle if detect a dead lock
 	LockCondition Lock (const std::string&	fileName);
