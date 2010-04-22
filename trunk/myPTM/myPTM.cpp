@@ -26,24 +26,6 @@ string ReadAll(const char* fileName){
 	return inFileBuf;
 }
 
-//vector<string> ReadLines(const char* fileName)
-//{
-//   FILE *fp = fopen(fileName,"r");
-//   vector<string> lines;
-//   if(!fp)
-//   {
-//	   return lines;
-//   }
-//   char *line = 0; /* space to read a line into */      <- UNSAFE!!
-//   int instr_count = 0;
-//   while ( fgets(line, sizeof line, fp) != NULL ) /* read each line */      
-//   {         
-//	  lines.push_back(string(line));
-//   }
-//	return lines;	
-//
-//}
-
 vector<string> ReadLines1(const char* fileName)
 {
 
@@ -113,11 +95,12 @@ int main(int argc, char** argv)
 	//operations in transactions:  TRAN_ID, OP_TYPE, MODE, FILE_NAME, RECORD_ID, CLIENT_NAME, PHONE	
 	
 	//schedule the transactions here:
-
+	Scheduler shr;
+	shr.ScheduleTransactions(TransactionManager.getTrans());
 
 	//output to database
 	DataManager myData;
-	myData.UpdateDatabase(TransactionManager.getTrans());
+	myData.UpdateDatabase(shr.GetCommitedOutput());
 
 	return 0;
 }
