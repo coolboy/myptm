@@ -3,8 +3,6 @@
 #include "TranManager.h"
 #include "Transaction.h"
 
-typedef std::map<int, Transaction> TranSet;
-
 class Scheduler
 {
 public:
@@ -16,6 +14,5 @@ public:
 	Operations GetCommitedOutput();
 
 private:
-	TranSet trans;
 };
 

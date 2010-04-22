@@ -1,8 +1,13 @@
 #include "StdAfx.h"
 #include "Scheduler.h"
 
+#include <iterator>
+#include <algorithm>
+
 using namespace std;
 using namespace boost;
+
+typedef list<TranManager::Operation> OpLst;
 
 Scheduler::Scheduler(void)
 {
@@ -11,8 +16,8 @@ Scheduler::Scheduler(void)
 
 void Scheduler::ScheduleTransactions(Operations Transactions)
 {
-	//Lock table
-	//class transaction
+	OpLst ls;
+	copy(Transactions.begin(), Transactions.end(), back_inserter(ls));
 }
 
 Scheduler::~Scheduler(void)
