@@ -36,9 +36,21 @@ OpLst ScheduleOperations(const OpLst& ls, LockManager& lm)
 		else {
 			std::vector<int> result = *lc.second;
 			if (result.size() > 1)//dead lock
-				;
-			else
-				;//no dead lock
+			/*
+			select the id from the ids which is the youngest one as the victim.
+			if the type is process, just delete the rest of this 'transaction'
+			if the type is transaction, just delete the whole transaction
+			*/
+			{
+				break;
+			}
+			else//no dead lock
+			/*Just move all current trans operations down the the last operation of the 
+			current lock owner trans.
+			*/
+			{
+				break;
+			}
 		}
 	}
 	return ret;
