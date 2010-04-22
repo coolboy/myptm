@@ -1,18 +1,26 @@
 #include "StdAfx.h"
 #include "Scheduler.h"
 
+using namespace std;
+using namespace boost;
 
 Scheduler::Scheduler(void)
 {
    
 }
 
-Operations Scheduler::ScheduleTransactions(Operations Transactions)
+void Scheduler::ScheduleTransactions(Operations Transactions)
 {
-   return Transactions;
+	//Lock table
+	//class transaction
 }
 
 Scheduler::~Scheduler(void)
 {
 
+}
+
+Operations Scheduler::GetCommitedOutput()
+{
+	return Operations();
 }

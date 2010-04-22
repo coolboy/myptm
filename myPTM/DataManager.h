@@ -1,4 +1,5 @@
 #pragma once
+
 #include "TranManager.h"
 
 class DataManager

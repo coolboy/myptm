@@ -1,9 +1,17 @@
 #include "StdAfx.h"
 #include "TranManager.h"
+
+#include <boost/variant.hpp>
+#include <boost/fusion/include/at_c.hpp>
+#include <boost/config/warning_disable.hpp>
+#include <boost/spirit/include/qi.hpp>
+#include <boost/bind.hpp>
+#include <boost/algorithm/string/join.hpp>
+#include <boost/foreach.hpp>
 #include <boost/xpressive/xpressive.hpp>
 #include <boost/xpressive/regex_actions.hpp>
-using namespace std;
 
+using namespace std;
 using namespace boost::xpressive;
 
 TranManager::TranManager()
@@ -471,14 +479,7 @@ TranManager::TranManager(fileList files, int lines)
 					CurrOp.m3 = what[filename].str();
               
 					Transaction.push_back(CurrOp);
-
-				
-
 				}
-				
-
-			
-
 		}
 
 	}   
