@@ -60,6 +60,19 @@ OpLst::const_iterator GetLastPositionById(const OpLst& ls, int tid)
 	return ret;
 }
 
+OpLst::const_iterator GetLastPositionById(const OpLst& ls, const TIDS& tids)
+{
+	auto ret = ls.end();
+
+	for (auto iter = ls.begin(); iter != ls.end(); iter++){
+		if (tids.find(iter->m0) != tids.end()){
+			ret = iter;
+		}
+	}
+
+	return ret;
+}
+
 //Get age of the transaction till end
 int GetAge(OpLst::const_iterator beg, OpLst::const_iterator end, int tid)
 {
@@ -102,7 +115,7 @@ OpLst ScheduleOperations(const OpLst& ls, LockManager& lm)
 			if the mode is process(0), just delete the rest of this 'transaction'
 			if the mode is transaction(1), just delete the whole transaction
 			*/{
-				std::vector<int>& result = lc.deadlock_ids;
+				TIDS& result = lc.deadlock_ids;
 				int youngestId = -1;
 				int currentYoungestAge = std::numeric_limits<int>::max();
 				for_each(result.begin(), result.end(), [&](int tid){
@@ -124,12 +137,12 @@ OpLst ScheduleOperations(const OpLst& ls, LockManager& lm)
 				
 				break;
 			}
-			else if (lc.latest_owner != -1)//no dead lock
+			else if (!lc.owners.empty())//no dead lock
 			/*Just move all current trans operations down the the last operation of the 
 			current lock owner trans.
 			*/{
 				auto currentBlockedTrans = TakeTransactionsById(ret, tid);
-				auto rid = lc	.latest_owner;
+				auto rid = lc	.owners;
 				auto lastPosOfRid = GetLastPositionById(ret, rid);
 				ret.splice(lastPosOfRid, currentBlockedTrans);
 				break;
