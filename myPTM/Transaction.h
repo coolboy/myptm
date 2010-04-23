@@ -1,5 +1,7 @@
 #pragma once
 
+#include <set>
+
 #include "TranManager.h"
 
 class Transaction
@@ -13,3 +15,4 @@ public:
 	Operations getCommitedResults();
 };
 
+typedef std::set<int> TIDS;

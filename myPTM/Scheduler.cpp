@@ -115,7 +115,8 @@ OpLst ScheduleOperations(const OpLst& ls, LockManager& lm)
 			if the mode is process(0), just delete the rest of this 'transaction'
 			if the mode is transaction(1), just delete the whole transaction
 			*/{
-				TIDS& result = lc.deadlock_ids;
+				//////////////////////////////////////////////////////////////////////////
+				TIDS& result = lc.deadlock_ids[0];// only break this first cycle
 				int youngestId = -1;
 				int currentYoungestAge = std::numeric_limits<int>::max();
 				for_each(result.begin(), result.end(), [&](int tid){
