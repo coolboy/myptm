@@ -21,6 +21,7 @@ public:
 
 class LockInfo
 {
+	typedef std::map<int, bool> WaitingQueue;
 public:
 	LockInfo():itemId(-1), type(-1){}
 
@@ -29,8 +30,20 @@ public:
 	int type; // 0-read 1-write
 	std::string	fileName;
 
+public:
+	/* Insert one transaction to the waiting queue
+	* tid: transaction id
+	* needWrite: want a write lock or not
+	*/
+	void setWaitingQueue(int tid, bool needWrite);
+	//free the transaction from the waiting queue
+	void unsetWaitingQueue(int tid);
+	//get current waiting transactions
+	TIDS getWaitingTransactions();
+
+private:
 	//tid, need upgrade to WL?
-	std::map<int, bool> waitingQueue;
+	WaitingQueue waitingQueue;
 };
 
 class LockManager

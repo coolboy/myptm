@@ -2,6 +2,8 @@
 
 #include "LockManager.h"
 
+using namespace std;
+
 LockManager::LockManager(void){}
 
 LockManager::~LockManager(void){}
@@ -22,7 +24,7 @@ LockCondition LockManager::Lock( int tid, int itemid, int type, const std::strin
 		return lc;
 	}
 	else if (!fli.owners.empty() && *fli.owners.begin() != tid && type == READ_TYPE){//WL | other-owned | Want to read
-		fli.waitingQueue[tid] = false;//////////////////////////////////////////////////////////////////////////
+		fli.setWaitingQueue(tid, false);
 
 		lc.get = false;
 		lc.owners = fli.owners;
@@ -30,7 +32,7 @@ LockCondition LockManager::Lock( int tid, int itemid, int type, const std::strin
 		return lc;
 	}
 	else if (!fli.owners.empty() && *fli.owners.begin() != tid && type == WRITE_TYPE){//WL | other-owned | Want to write
-		fli.waitingQueue[tid] = true;
+		fli.setWaitingQueue(tid, true);
 
 		lc.get = false;
 		lc.owners = fli.owners;
@@ -64,7 +66,7 @@ LockCondition LockManager::Lock( int tid, int itemid, int type, const std::strin
 				return lc;
 			}
 			else{//Others also sharing this lock
-				ili.waitingQueue[tid] = true;// insert current requesting tid to queue with the req to up RL 2 WL
+				ili.setWaitingQueue(tid, true);// insert current requesting tid to queue with the req to up RL 2 WL
 
 				lc.get = false;
 				lc.owners = ili.owners;
@@ -90,7 +92,7 @@ LockCondition LockManager::Lock( int tid, int itemid, int type, const std::strin
 			return lc;
 		}
 		else if (ili.type == READ_TYPE && ili.owners.find(tid) == ili.owners.end() && type == WRITE_TYPE){// RL | other-owned | Want to write
-			ili.waitingQueue[tid] = true;
+			ili.setWaitingQueue(tid, true);// insert current requesting tid to queue with the req to up RL 2 WL
 
 			lc.get = false;
 			lc.owners = ili.owners;
@@ -98,7 +100,7 @@ LockCondition LockManager::Lock( int tid, int itemid, int type, const std::strin
 			return lc;
 		}
 		else if (ili.type == WRITE_TYPE && ili.owners.find(tid) == ili.owners.end() && type == READ_TYPE){// WL | other-owned | Want to read
-			ili.waitingQueue[tid] = false;
+			ili.setWaitingQueue(tid, false);
 
 			lc.get = false;
 			lc.owners = ili.owners;
@@ -106,7 +108,7 @@ LockCondition LockManager::Lock( int tid, int itemid, int type, const std::strin
 			return lc;
 		}
 		else if (ili.type == WRITE_TYPE && ili.owners.find(tid) == ili.owners.end() && type == WRITE_TYPE){// WL | other-owned | Want to write
-			ili.waitingQueue[tid] = true;
+			ili.setWaitingQueue(tid, true);
 
 			lc.get = false;
 			lc.owners = ili.owners;
@@ -149,4 +151,32 @@ DeadLockDetector::~DeadLockDetector( void )
 
 LockCycles DeadLockDetector::Detect(const LockManager::ItemLocks& ils, const LockManager::FileLocks& fls){
 	return LockCycles();
+}
+
+void LockInfo::setWaitingQueue( int tid, bool needWrite )
+{
+	if (waitingQueue.find(tid) != waitingQueue.end()){
+		bool currentReq = waitingQueue[tid];
+		if (currentReq == true)
+			return;//need write already, no need to insert to the queue again
+		else
+			waitingQueue[tid] = needWrite;
+	}
+	else
+		waitingQueue[tid] = needWrite;
+}
+
+void LockInfo::unsetWaitingQueue( int tid )
+{
+	waitingQueue.erase(tid);
+}
+
+TIDS LockInfo::getWaitingTransactions()
+{
+	TIDS ret;
+	for_each(waitingQueue.begin(), waitingQueue.end(), [&ret](const WaitingQueue::value_type& val){
+		ret.insert(val.first);
+	});
+
+	return ret;
 }
