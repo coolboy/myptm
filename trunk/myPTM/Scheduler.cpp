@@ -3,11 +3,6 @@
 #include "Scheduler.h"
 #include "LockManager.h"
 
-#include <iterator>
-#include <algorithm>
-#include <limits>
-#include <cassert>
-
 #undef max
 
 using namespace std;
@@ -91,20 +86,23 @@ OpLst ScheduleOperations(const OpLst& ls, LockManager& lm)
 
 		assert (type != -1);
 		LockCondition lc;
-		if (type != 2)
+		if (type == 0 || type == 1)
 			lc = lm.Lock(tid, itemid, type, filename);
-		else
+		else if (type == 2)
 			lc = lm.Lock(filename);
 
-		if (lc.first == true)//get the lock
+		if (lc.deadlock_ids.empty())
+			continue;
+
+		if (lc.get == true)//get the lock
 			continue;
 		else {
-			std::vector<int> result = *lc.second;
-			if (result.size() > 1)//dead lock
+			if (!lc.deadlock_ids.empty())//dead lock
 			/* select the id from the ids which is the youngest one as the victim.
 			if the mode is process(0), just delete the rest of this 'transaction'
 			if the mode is transaction(1), just delete the whole transaction
 			*/{
+				std::vector<int>& result = lc.deadlock_ids;
 				int youngestId = -1;
 				int currentYoungestAge = std::numeric_limits<int>::max();
 				for_each(result.begin(), result.end(), [&](int tid){
@@ -126,13 +124,12 @@ OpLst ScheduleOperations(const OpLst& ls, LockManager& lm)
 				
 				break;
 			}
-			else//no dead lock
+			else if (lc.latest_owner != -1)//no dead lock
 			/*Just move all current trans operations down the the last operation of the 
 			current lock owner trans.
 			*/{
-				assert (result.size() == 1);
 				auto currentBlockedTrans = TakeTransactionsById(ret, tid);
-				auto rid = result[0];
+				auto rid = lc	.latest_owner;
 				auto lastPosOfRid = GetLastPositionById(ret, rid);
 				ret.splice(lastPosOfRid, currentBlockedTrans);
 				break;
