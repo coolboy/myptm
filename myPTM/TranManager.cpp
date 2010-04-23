@@ -49,9 +49,13 @@ TranManager::TranManager(fileList files)
 		       >> (delim= *_s)
 		       >> (mode = (boost::xpressive::set= '0','1'));
 
-	cregex commit = (opcommit = 'C');
+	cregex commit = (opcommit = 'C')
+		       >> (delim= *_s)
+			   >> (_n |eos);
 
-    cregex abord = (opabord = 'A');
+    cregex abord = (opabord = 'A')
+		       >> (delim= *_s)
+			   >> (_n |eos);
 
 	//cregex phone = +_d >> '-'>> +_d>> '-'>> +_d;
 	
@@ -301,9 +305,13 @@ TranManager::TranManager(fileList files, int lines)
 		       >> (delim= *_s)
 		       >> (mode = (boost::xpressive::set= '0','1'));
 
-	cregex commit = (opcommit = 'C');
+	cregex commit = (opcommit = 'C')
+		       >> (delim= *_s)
+			   >> (_n | eos);
 
-    cregex abord = (opabord = 'A');
+    cregex abord = (opabord = 'A')
+		       >> (delim= *_s)
+			   >> (_n | eos);
 
 	//cregex phone = +_d >> '-'>> +_d>> '-'>> +_d;
 	

@@ -26,7 +26,7 @@ int DataManager::UpdateDatabase(Operations Ops)
 	int RecordId;
 	int lineNum, lineIndex;
 	int numOps = Ops.size();
-	vector<string> theFile;
+	//vector<string> &theFile;
 	map<string, vector<string> > outBuff;
 	map<string, vector<string> >::iterator buffIter;
 	string::size_type rPos;
@@ -49,7 +49,7 @@ int DataManager::UpdateDatabase(Operations Ops)
 		 }
 
 		 RecordIdStr = boost::lexical_cast<string>(RecordId);
-		 theFile = outBuff[fileName];
+		 vector<string> &theFile = outBuff[fileName];
 		 lineNum = theFile.size();
 
 		 for(lineIndex = 0; lineIndex<lineNum; lineIndex++)
@@ -79,15 +79,16 @@ int DataManager::UpdateDatabase(Operations Ops)
 		 }
 
 		 RecordIdStr = boost::lexical_cast<string>(RecordId);
-		 theFile = outBuff[fileName];
+		 vector<string> &theFile = outBuff[fileName];
 		 lineNum = theFile.size();
 
- 		 if( 0>RecordId || 10000<RecordId)
-		 {
+ 		 //if( 0>RecordId || 10000<RecordId)
+		 //{
             theFile.erase(theFile.begin(),theFile.end());	    	 
-		 }
+		 //}
 
-		 for(lineIndex = 0; lineIndex<lineNum; lineIndex++)
+		 /*
+	     for(lineIndex = 0; lineIndex<lineNum; lineIndex++)
 		 {
 			 rPos = theFile[lineIndex].find_first_of(",",0);
 			 rId = atoi(theFile[lineIndex].substr(0, rPos).c_str());
@@ -97,6 +98,7 @@ int DataManager::UpdateDatabase(Operations Ops)
 				 break;
 			 }
 		 }
+		 */
 
 	  }
 	  
