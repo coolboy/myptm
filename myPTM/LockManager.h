@@ -4,6 +4,9 @@
 
 #include "Transaction.h"
 
+#define READ_TYPE 0
+#define WRITE_TYPE 1
+
 typedef std::vector<TIDS> LockCycles;
 
 class LockCondition
@@ -19,6 +22,8 @@ public:
 class LockInfo
 {
 public:
+	LockInfo():itemId(-1), type(-1){}
+
 	TIDS owners; //Current owners
 	int itemId;
 	int type; // 0-read 1-write
@@ -32,7 +37,7 @@ class LockManager
 {
 public:
 	typedef std::map<int, LockInfo> ItemLocks;
-	typedef std::map<int, std::string> FileLocks;
+	typedef std::map<std::string, LockInfo> FileLocks;
 
 public:
 	LockManager(void);
@@ -46,15 +51,15 @@ public:
 	LockCondition Lock (const std::string&	fileName);
 
 	//Reinit the class
-	void clear(){;}
+	void clear();
 
 	//Free all the locks that owned by tid
-	void FreeLock(int tid){;}
+	void FreeLock(int tid);
 
 private:
 	//lockId = tid + itemid << 10 + type << 20, lock
 	ItemLocks	itemLocks;
-	//file lock : tid, fileName
+	//file lock : fileName, LockInfo
 	FileLocks fileLocks;
 };
 
@@ -63,10 +68,8 @@ class DeadLockDetector
 public:
 
 public:
-	DeadLockDetector(void){}
-	~DeadLockDetector(void){}
+	DeadLockDetector(void);
+	~DeadLockDetector(void);
 
-	LockCycles Detect(const LockManager::ItemLocks& ils, const LockManager::FileLocks& fls){
-		return LockCycles();
-	}
+	LockCycles Detect(const LockManager::ItemLocks& ils, const LockManager::FileLocks& fls);
 };
