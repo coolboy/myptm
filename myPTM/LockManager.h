@@ -57,7 +57,7 @@ public:
 	void FreeLock(int tid);
 
 private:
-	//lockId = tid + itemid << 10 + type << 20, lock
+	//lockId = tid + itemid << 10 + type << 20, LockInfo
 	ItemLocks	itemLocks;
 	//file lock : fileName, LockInfo
 	FileLocks fileLocks;
