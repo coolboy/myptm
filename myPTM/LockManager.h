@@ -22,7 +22,8 @@ public:
 	int type; // 0-read 1-write
 	std::string	fileName;
 
-	TIDS waitingQueue;
+	//tid, need upgrade to WL?
+	std::map<int, bool> waitingQueue;
 };
 
 class LockManager
