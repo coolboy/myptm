@@ -6,6 +6,7 @@
 
 #define READ_TYPE 0
 #define WRITE_TYPE 1
+#define DELETE_TYPE 2
 
 typedef std::vector<TIDS> LockCycles;
 
@@ -21,7 +22,17 @@ public:
 
 class LockInfo
 {
-	typedef std::map<int, bool> WaitingQueue;
+public:
+	class Job{
+	public:
+		Job():itemId_(-1), type_(-1){}
+		Job (int itemid, int type, const std::string& fileName):itemId_(itemid), type_(type), fileName_(fileName){}
+
+		int itemId_;//for R/W
+		int type_;
+		std::string	 fileName_;//For R/W
+	};
+	typedef std::map<int, Job> WaitingQueue;
 public:
 	LockInfo():itemId(-1), type(-1){}
 
@@ -35,7 +46,7 @@ public:
 	* tid: transaction id
 	* needWrite: want a write lock or not
 	*/
-	void setWaitingQueue(int tid, bool needWrite);
+	void setWaitingQueue(int tid, const Job& job);
 	//free the transaction from the waiting queue
 	void unsetWaitingQueue(int tid);
 	//get current waiting transactions
@@ -61,10 +72,10 @@ public:
 	LockCondition Lock (int tid, int itemid, int type, const std::string&	fileName);
 
 	//lock the whole file  and return the trans ids in the cycle if detect a dead lock
-	LockCondition Lock (const std::string&	fileName);
+	LockCondition Lock (int tid, const std::string&	fileName);
 
 	//Reinit the class
-	void clear();
+	void Clear();
 
 	//Free all the locks that owned by tid
 	void FreeLock(int tid);

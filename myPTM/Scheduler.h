@@ -14,5 +14,6 @@ public:
 	Operations GetCommitedOutput();
 
 private:
+	Operations commitedOps;
 };
 
