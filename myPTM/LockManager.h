@@ -1,23 +1,23 @@
 #pragma once
 
-#include <vector>
+#include <set>
 
-typedef std::vector<int> TIDS;
+typedef std::set<int> TIDS;
 
 class LockCondition
 {
 public:
-	LockCondition():get(false), latest_owner(-1){}
+	LockCondition():get(false) {}
 
 	bool get; //get it?
-	int latest_owner; //latest owner tid
+	TIDS owners; //Current owners
 	TIDS deadlock_ids; //the current deadlock ids
 };
 
 class LockInfo
 {
 public:
-	int latest_owner; //latest owner tid
+	TIDS owners; //Current owners
 	int itemId;
 	int type; // 0-read 1-write
 	std::string	fileName;
