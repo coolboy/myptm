@@ -1,8 +1,10 @@
 #pragma once
 
-#include <set>
+#include <map>
 
-typedef std::set<int> TIDS;
+#include "Transaction.h"
+
+typedef std::vector<TIDS> LockCycles;
 
 class LockCondition
 {
@@ -11,7 +13,7 @@ public:
 
 	bool get; //get it?
 	TIDS owners; //Current owners
-	TIDS deadlock_ids; //the current deadlock ids
+	LockCycles deadlock_ids; //the current deadlock ids
 };
 
 class LockInfo
@@ -28,6 +30,10 @@ public:
 
 class LockManager
 {
+public:
+	typedef std::map<int, LockInfo> ItemLocks;
+	typedef std::map<int, std::string> FileLocks;
+
 public:
 	LockManager(void);
 	~LockManager(void);
@@ -47,7 +53,20 @@ public:
 
 private:
 	//lockId = tid + itemid << 10 + type << 20, lock
-	std::map<int, LockInfo> locks;
+	ItemLocks	itemLocks;
 	//file lock : tid, fileName
-	std::map<int, std::string> fileLocks;
+	FileLocks fileLocks;
+};
+
+class DeadLockDetector
+{
+public:
+
+public:
+	DeadLockDetector(void){}
+	~DeadLockDetector(void){}
+
+	LockCycles Detect(const LockManager::ItemLocks& ils, const LockManager::FileLocks& fls){
+		return LockCycles();
+	}
 };
