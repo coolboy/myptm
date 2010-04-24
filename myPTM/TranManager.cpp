@@ -152,7 +152,7 @@ TranManager::TranManager(fileList files)
 				    std::cout << what[0] << '\n'; // whole match
 
 					CurrOp.m0 = FileCurrTranId[fileIndex];
-					CurrOp.m1 = ABORD;
+					CurrOp.m1 = ABORT;
 					CurrOp.m2 = FileCurrMode[fileIndex];
 
 					Transaction.push_back(CurrOp);
@@ -408,7 +408,7 @@ TranManager::TranManager(fileList files, int lines)
 			    std::cout << what[0] << '\n'; // whole match
 
 				CurrOp.m0 = FileCurrTranId[fileIndex];
-				CurrOp.m1 = ABORD;
+				CurrOp.m1 = ABORT;
 				CurrOp.m2 = FileCurrMode[fileIndex];
 
 				Transaction.push_back(CurrOp);

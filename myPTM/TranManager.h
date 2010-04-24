@@ -14,7 +14,7 @@ public:
 		DEL = 2,
 		COMMIT = 3,
 		BEGIN = 4,
-		ABORD = 5,
+		ABORT = 5,
 		UNKONWN = 6
 	} OpType;
 
